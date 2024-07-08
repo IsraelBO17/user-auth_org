@@ -16,6 +16,7 @@ Dependencies:
     python-dotenv
     dj-database-url
     "psycopg[binary]"
+    gunicorn
 
 """
 from os import getenv

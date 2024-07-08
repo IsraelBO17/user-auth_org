@@ -7,9 +7,11 @@ Django==5.0.6
 djangorestframework==3.15.2
 djangorestframework-simplejwt==5.3.1
 drf-spectacular==0.27.2
+gunicorn==22.0.0
 inflection==0.5.1
 jsonschema==4.22.0
 jsonschema-specifications==2023.12.1
+packaging==24.1
 psycopg==3.2.1
 psycopg-binary==3.2.1
 pycparser==2.22
