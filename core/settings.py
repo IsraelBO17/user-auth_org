@@ -40,7 +40,8 @@ load_dotenv()
 SECRET_KEY = str(getenv('SECRET_KEY'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = getenv('DEBUG') == 'True'
+# DEBUG = getenv('DEBUG') == 'True'
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
 

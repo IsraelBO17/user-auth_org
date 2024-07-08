@@ -25,7 +25,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 'phone': user.data['phone'],
             }
         }
-        
+
         return data
 
 

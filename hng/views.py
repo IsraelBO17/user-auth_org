@@ -16,14 +16,13 @@ User = get_user_model()
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-
         try:
+            serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             payload = {
                 'status': 'success',
                 'message': 'Login successful',
-                'data': serializer.validated_data
+                'data': serializer.data
             }
         except Exception as e:
             payload = {
@@ -43,45 +42,39 @@ class UserViewSet(mixins.CreateModelMixin,
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'userId'
+    # lookup_url_kwarg = 'userId'
 
     def get_permissions(self):
         if self.action == 'retrieve':
-            return [IsAuthenticated]
+            permission_classes = [IsAuthenticated]
         return super().get_permissions()
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-
         try:
-            if serializer.is_valid(raise_exception=True):
-                user = self.perform_create(serializer)
-                headers = self.get_success_headers(serializer.data)
-                refresh = RefreshToken.for_user(user)
-                access_token = str(refresh.access_token)
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user = self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
 
-                payload = {
-                    'status': 'success',
-                    'message': 'Registration successful',
-                    'data': {
-                        'accessToken': access_token,
-                        # 'user': serializer.validated_data,
-                        'user': {
-                            'userId': serializer.validated_data['userId'],
-                            'firstName': serializer.validated_data['firstName'],
-                            'lastName': serializer.validated_data['lastName'],
-                            'email': serializer.validated_data['email'],
-                            'phone': serializer.validated_data['phone'],
-                        }
+            payload = {
+                'status': 'success',
+                'message': 'Registration successful',
+                'data': {
+                    'accessToken': access_token,
+                    # 'user': serializer.data,
+                    'user': {
+                        'userId': serializer.data['userId'],
+                        'firstName': serializer.data['firstName'],
+                        'lastName': serializer.data['lastName'],
+                        'email': serializer.data['email'],
+                        'phone': serializer.data['phone'],
                     }
                 }
-                return Response(payload, status=status.HTTP_201_CREATED, headers=headers)
-            else:
-                payload = {
-                    'status': 'Bad request',
-                    'message': 'Registration unsuccessful',
-                    'statusCode': status.HTTP_400_BAD_REQUEST
-                }
-                return Response(payload, status=status.HTTP_400_BAD_REQUEST)
+            }
+            return Response(payload, status=status.HTTP_201_CREATED, headers=headers)
+        
         except ValidationError as error:
             errors = error.detail
             formatted_errors = []
@@ -95,8 +88,18 @@ class UserViewSet(mixins.CreateModelMixin,
                 formatted_errors.append(formatted_error)
 
             payload = {'errors': formatted_errors}
-
             return Response(payload, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        
+        except Exception as e:
+            payload = {
+                'status': 'Bad request',
+                'message': 'Registration unsuccessful',
+                'statusCode': status.HTTP_400_BAD_REQUEST
+            }
+            return Response(payload, status=status.HTTP_400_BAD_REQUEST)
+    
+    def perform_create(self, serializer):
+        return serializer.save()
     
     def retrieve(self, request, *args, **kwargs):
         response = super().retrieve(request, *args, **kwargs)
@@ -134,9 +137,9 @@ class OrganisationViewSet(mixins.CreateModelMixin,
     
     def get_permissions(self):
         if self.action == 'retrieve':
-            return [IsMember]
+            permission_classes = [IsMember]
         elif self.action == 'add_user':
-            return [AllowAny]
+            permission_classes = [AllowAny]
         return super().get_permissions()
     
     def get_serializer_class(self):
@@ -154,13 +157,7 @@ class OrganisationViewSet(mixins.CreateModelMixin,
                     'data': reponse.data
                 }
                 return Response(payload, status=status.HTTP_201_CREATED)
-            else:
-                payload = {
-                    'status': 'Bad request',
-                    'message': 'Client error',
-                    'statusCode': status.HTTP_400_BAD_REQUEST
-                }
-                return Response(payload, status=status.HTTP_400_BAD_REQUEST)
+
         except ValidationError as error:
             errors = error.detail
             formatted_errors = []
@@ -174,8 +171,14 @@ class OrganisationViewSet(mixins.CreateModelMixin,
                 formatted_errors.append(formatted_error)
 
             payload = {'errors': formatted_errors}
-
             return Response(payload, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        except Exception as e:
+            payload = {
+                'status': 'Bad request',
+                'message': 'Client error',
+                'statusCode': status.HTTP_400_BAD_REQUEST
+            }
+            return Response(payload, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, *args, **kwargs):
         response = super().retrieve(request, *args, **kwargs)
@@ -198,23 +201,25 @@ class OrganisationViewSet(mixins.CreateModelMixin,
     @action(detail=True, methods=["post"],url_path="users")
     def add_user(self, request, *args, **kwargs):
         organisation = self.get_object()
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            user_id = serializer.validated_data
-            user = get_object_or_404(User, userId=user_id['userId'])
-            if user in organisation.users.all():
-                payload = {
-                    'status': 'success',
-                    'message': 'User already added to organisation'
-                }
-            else:
-                organisation.users.add(user)
-                payload = {
-                    'status': 'success',
-                    'message': 'User added to organisation successfully'
-                }
-            return Response(payload, status=status.HTTP_200_OK)
-        else:
+
+        try:
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                user_id = serializer.data
+                user = get_object_or_404(User, userId=user_id['userId'])
+                if user in organisation.users.all():
+                    payload = {
+                        'status': 'success',
+                        'message': 'User already added to organisation'
+                    }
+                else:
+                    organisation.users.add(user)
+                    payload = {
+                        'status': 'success',
+                        'message': 'User added to organisation successfully'
+                    }
+                return Response(payload, status=status.HTTP_200_OK)
+        except:
             payload = {
                 'status': 'Bad request',
                 'message': 'Client error',
