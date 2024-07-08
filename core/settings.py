@@ -11,10 +11,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 Dependencies:
     djangorestframework
-    drf-spectacular
     djangorestframework-simplejwt[crypto]
+    drf-spectacular
     python-dotenv
     dj-database-url
+    "psycopg[binary]"
 
 """
 from os import getenv
@@ -40,7 +41,7 @@ SECRET_KEY = str(getenv('SECRET_KEY'))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
 
 
 # Application definition
