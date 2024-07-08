@@ -1,11 +1,15 @@
 from django.urls import path
-from . import views
+from rest_framework.routers import SimpleRouter
+from .views import CustomTokenObtainPairView, UserViewSet, OrganisationViewSet
+
+
+router = SimpleRouter(trailing_slash=False)
+router.register('api/organisations', OrganisationViewSet, basename='organisation')
 
 urlpatterns = [
-    path('auth/register/', views.register, name='register'),
-    path('auth/login/', views.login, name='login'),
-    # path('api/users/<userId>',),
-    # path('api/organisations',),
-    # path('api/organisations/<orgId>',),
-    # path('api/organisations/<orgId>/users',),
+    path('auth/register', UserViewSet.as_view({'post': 'create'}, name='user-create')),
+    path('auth/login', CustomTokenObtainPairView.as_view(), name='login'),
+    path('api/users/<userId>', UserViewSet.as_view({'get': 'retrieve'}, name='user-retrieve')),
 ]
+
+urlpatterns += router.urls

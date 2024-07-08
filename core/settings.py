@@ -8,22 +8,37 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
-"""
 
+Dependencies:
+    djangorestframework
+    drf-spectacular
+    djangorestframework-simplejwt[crypto]
+    python-dotenv
+    dj-database-url
+
+"""
+from os import getenv
 from pathlib import Path
+from datetime import timedelta
+from django.core.management.utils import get_random_secret_key
+
+from dotenv import load_dotenv
+import dj_database_url
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@$e6i9oz1_q6_imtw8cc99$gbx$72loek22(795y_4-lr66vtp'
+SECRET_KEY = str(getenv('SECRET_KEY'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = getenv('DEBUG') == 'True'
 
 ALLOWED_HOSTS = []
 
@@ -38,8 +53,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework.authtoken',
     'rest_framework_simplejwt',
+    'drf_spectacular',
     'hng',
 ]
 
@@ -78,12 +93,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.parse(
+        str(getenv('DATABASE_URL')),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -132,5 +147,12 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    'EXCEPTION_HANDLER': 'utils.exceptions.custom_exception_handler',
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=3),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'USER_ID_FIELD': 'userId',
+    'TOKEN_OBTAIN_SERIALIZER': 'hng.serializers.CustomTokenObtainPairSerializer',
 }
