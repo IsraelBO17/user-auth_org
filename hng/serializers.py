@@ -49,10 +49,8 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-class AddUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['userId']
+class AddUserSerializer(serializers.Serializer):
+    userId = serializers.UUIDField()
 
 
 class OrganisationSerializer(serializers.ModelSerializer):
