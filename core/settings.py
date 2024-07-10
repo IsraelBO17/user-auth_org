@@ -40,10 +40,9 @@ load_dotenv()
 SECRET_KEY = str(getenv('SECRET_KEY'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = getenv('DEBUG') == 'True'
-DEBUG = True
+DEBUG = getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
+ALLOWED_HOSTS = ['127.0.0.1', str(getenv('ALLOWED_HOST'))]
 
 
 # Application definition
@@ -154,8 +153,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=3),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'USER_ID_FIELD': 'userId',
     'TOKEN_OBTAIN_SERIALIZER': 'hng.serializers.CustomTokenObtainPairSerializer',
 }

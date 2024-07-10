@@ -99,35 +99,33 @@ class UserViewSet(mixins.CreateModelMixin,
         return serializer.save()
     
     def retrieve(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            if instance.userId != request.user.userId:
-                # Check for shared organization membership if requesting different user
-                shared_orgs = instance.organizations.filter(users__in=[request.user])
-                if not shared_orgs.exists():
-                    payload = {
-                        'status': 'Unauthorized',
-                        'message': 'You do not have the permission to retrieve this user',
-                        'statusCode': status.HTTP_403_FORBIDDEN
-                    }
-                    return Response(payload, status=HTTP_403_FORBIDDEN)
-
-            serializer = self.get_serializer(instance)
-            payload = {
-                'status': 'success',
-                'message': 'User successfully retrieved',
-                # 'data': serializer.data,
-                'data': {
-                    'userId': serializer.data['userId'],
-                    'firstName': serializer.data['firstName'],
-                    'lastName': serializer.data['lastName'],
-                    'email': serializer.data['email'],
-                    'phone': serializer.data['phone'],
+        instance = self.get_object()
+        if instance.userId != request.user.userId:
+            # Check for shared organisation membership if requesting different user
+            shared_orgs = instance.organisation_set.filter(users=request.user)
+            if not shared_orgs.exists():
+                payload = {
+                    'status': 'Unauthorized',
+                    'message': 'You do not have the permission to retrieve this user',
+                    'statusCode': status.HTTP_403_FORBIDDEN
                 }
+                return Response(payload, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = self.get_serializer(instance)
+        payload = {
+            'status': 'success',
+            'message': 'User successfully retrieved',
+            # 'data': serializer.data,
+            'data': {
+                'userId': serializer.data['userId'],
+                'firstName': serializer.data['firstName'],
+                'lastName': serializer.data['lastName'],
+                'email': serializer.data['email'],
+                'phone': serializer.data['phone'],
             }
-            return Response(payload, status=status.HTTP_200_OK)
-        except :
-            pass
+        }
+        return Response(payload, status=status.HTTP_200_OK)
+       
 
 
 class OrganisationViewSet(mixins.CreateModelMixin,
@@ -149,6 +147,8 @@ class OrganisationViewSet(mixins.CreateModelMixin,
     def get_permissions(self):
         if self.action == 'add_user':
             self.permission_classes = []
+        elif self.action == 'retrieve':
+            self.permission_classes = [IsMember]
         return super().get_permissions()      
     
     def get_serializer_class(self):
