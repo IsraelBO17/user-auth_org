@@ -168,22 +168,6 @@ class OrganisationViewSet(mixins.CreateModelMixin,
                 'data': serializer.data
             }
             return Response(payload, status=status.HTTP_201_CREATED)
-
-        except ValidationError as error:
-            errors = error.detail
-            formatted_errors = []
-
-            for field, error_details in errors.items():
-                error_detail = error_details[0]
-                formatted_error = {
-                    'field': field,
-                    'message': error_detail
-                }
-                formatted_errors.append(formatted_error)
-
-            payload = {'errors': formatted_errors}
-            return Response(payload, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-
         except Exception as e:
             payload = {
                 'status': 'Bad request',
@@ -206,7 +190,9 @@ class OrganisationViewSet(mixins.CreateModelMixin,
         payload = {
             'status': 'success',
             'message': 'Organisations in which you are a member of, sucessfully retrieved',
-            'data': response.data
+            'data': {
+                'organisations': response.data
+            }
         }
         return Response(payload, status=status.HTTP_200_OK)
 
