@@ -17,6 +17,7 @@ Dependencies:
     dj-database-url
     "psycopg[binary]"
     gunicorn
+    whitenoise
 
 """
 from os import getenv
@@ -37,10 +38,10 @@ load_dotenv()
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = str(getenv('SECRET_KEY'))
+SECRET_KEY = getenv('SECRET_KEY', get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = getenv('DEBUG') == 'True'
+DEBUG = bool(getenv('DEBUG', False))
 
 # ALLOWED_HOSTS = ['127.0.0.1', str(getenv('ALLOWED_HOST'))]
 ALLOWED_HOSTS = getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,[::1],.vercel.app,.now.sh").split(",")
