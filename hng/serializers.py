@@ -16,7 +16,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         user = UserSerializer(instance=self.user)
         data = {
             'accessToken': access_token,
-            'user': user.data,
             'user': {
                 'userId': user.data['userId'],
                 'firstName': user.data['firstName'],
