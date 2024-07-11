@@ -10,14 +10,14 @@ Using your most comfortable backend framework of your choice, adhere to the foll
 ### User
 + Create a `User` model using the properties below
 + NB: user id and email must be unique
-    `{
-        "userId": "string" // must be unique
-        "firstName": "string", // must not be null
-        "lastName": "string" // must not be null
-        "email": "string" // must be unique and must not be null
-        "password": "string" // must not be null
-        "phone": "string"
-    }`
+  `{
+      "userId": "string" // must be unique
+      "firstName": "string", // must not be null
+      "lastName": "string" // must not be null
+      "email": "string" // must be unique and must not be null
+      "password": "string" // must not be null
+      "phone": "string"
+  }`
 
 + Provide validation for all fields. When there’s a validation error, return status code `422` with payload:
     `{
