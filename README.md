@@ -1,6 +1,3 @@
-# user-auth_org
-HNG Task 2
-
 # HNG Stage 2 Task: User Authentication & Organisation
 Using your most comfortable backend framework of your choice, adhere to the following acceptance:
 **READ CAREFULLY!!!**
