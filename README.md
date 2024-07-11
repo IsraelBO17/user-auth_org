@@ -12,7 +12,7 @@ Using your most comfortable backend framework of your choice, adhere to the foll
 + NB: user id and email must be unique
   `{
       "userId": "string" // must be unique
-      "firstName": "string", // must not be null
+      "firstName": "string" // must not be null
       "lastName": "string" // must not be null
       "email": "string" // must be unique and must not be null
       "password": "string" // must not be null
