@@ -10,24 +10,24 @@ Using your most comfortable backend framework of your choice, adhere to the foll
 ### User
 + Create a `User` model using the properties below
 + NB: user id and email must be unique
-    {
+    `{
         "userId": "string" // must be unique
         "firstName": "string", // must not be null
         "lastName": "string" // must not be null
         "email": "string" // must be unique and must not be null
         "password": "string" // must not be null
         "phone": "string"
-    }
+    }`
 
 + Provide validation for all fields. When there’s a validation error, return status code `422` with payload:
-    {
+    `{
         "errors": [
             {
                 "field": "string",
                 "message": "string"
             },
         ]
-    }
+    }`
 
 + Using the schema above, implement user authentication
     + User Registration:
@@ -40,11 +40,11 @@ Using your most comfortable backend framework of your choice, adhere to the foll
 
 ### Organisation
 + Create Organisation model using the properties below
-    {
+    `{
         "orgId": "string", // Unique
         "name": "string", // Required and cannot be null
         "description": "string",
-    }
+    }`
 
 + A user can belong to one or more organisations.
 + An organisation can contain one or more users.
@@ -57,15 +57,15 @@ Using your most comfortable backend framework of your choice, adhere to the foll
 
 + `[POST] /auth/register`: Registers a user and creates a default organisation.
     + Register request body:
-        {
+        `{
             "firstName": "string",
             "lastName": "string",
             "email": "string",
             "password": "string",
             "phone": "string",
-        }
+        }`
     + Successful response: Return the payload below with a `201` success status code.
-        {
+        `{
             "status": "success",
             "message": "Registration successful",
             "data": {
@@ -78,22 +78,22 @@ Using your most comfortable backend framework of your choice, adhere to the foll
                     "phone": "string"
                 }
             }
-        }
+        }`
     + Unsuccessful registration response:
-        {
+        `{
             "status": "Bad request",
             "message": "Registration unsuccessful",
             "statusCode": 400
-        }
+        }`
 
 + `[POST] /auth/login`: logs in a user. When a user logs in, they can select an organisation to interact with.
     + Login request body:
-        {
+        `{
             "email": "string",
             "password": "string",
-        }
+        }`
     + Successful response: Return the payload below with a 200 success status code.
-        {
+        `{
             "status": "success",
             "message": "Login successful",
             "data": {
@@ -106,17 +106,17 @@ Using your most comfortable backend framework of your choice, adhere to the foll
                     "phone": "string"
                 }
             }
-        }
+        }`
     + Unsuccessful login response:
-        {
+        `{
             "status": "Bad request",
             "message": "Authentication failed",
             "statusCode": 401
-        }
+        }`
 
 + `[GET] /api/users/:id`: a user gets their own record or user record in organisations they belong to or created [PROTECTED].
     + Successful response: Return the payload below with a `200` success status code.
-        {
+        `{
             "status": "success",
             "message": "<message>",
             "data": {
@@ -126,11 +126,11 @@ Using your most comfortable backend framework of your choice, adhere to the foll
                 "email": "string",
                 "phone": "string"
             }
-        }
+        }`
 
 + `[GET] /api/organisations`: gets all the organisations the user belongs to or created. If a user is logged in properly, they can get all their organisations. They should not get another user’s organisation [PROTECTED].
     + Successful response: Return the payload below with a `200` success status code.
-        {
+        `{
             "status": "success",
             "message": "<message>",
             "data": {
@@ -142,11 +142,11 @@ Using your most comfortable backend framework of your choice, adhere to the foll
                     }
                 ]
             }
-        }
+        }`
 
 + `[GET] /api/organisations/:orgId`: the logged in user gets a single organisation record [PROTECTED]
     + Successful response: Return the payload below with a `200` success status code.
-        {
+        `{
             "status": "success",
             "message": "<message>",
             "data": {
@@ -154,16 +154,16 @@ Using your most comfortable backend framework of your choice, adhere to the foll
                 "name": "string", // Required and cannot be null
                 "description": "string"
             }
-        }
+        }`
 
 + `[POST] /api/organisations`: a user can create their new organisation [PROTECTED].
     + Request body: request body must be validated.
-        {
+        `{
             "name": "string", // Required and cannot be null
             "description": "string"
-        }
+        }`
     + Successful response: Return the payload below with a `201` success status code.
-        {
+        `{
             "status": "success",
             "message": "Organisation created successfully",
             "data": {
@@ -171,24 +171,24 @@ Using your most comfortable backend framework of your choice, adhere to the foll
                 "name": "string", 
                 "description": "string"
             }
-        }
+        }`
     + Unsuccessful response:
-        {
+        `{
             "status": "Bad Request",
             "message": "Client error",
             "statusCode": 400
-        }
+        }`
 
 + `[POST] /api/organisations/:orgId/users`: adds a user to a particular organisation
     + Request body:
-        {
+        `{
             "userId": "string"
-        }
+        }`
     + Successful response: Return the payload below with a 200 success status code.
-        {
+        `{
             "status": "success",
             "message": "User added to organisation successfully",
-        }
+        }`
 
 
 ## Unit Testing
